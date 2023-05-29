@@ -3,28 +3,18 @@ import React from 'react';
 import Button from '../Button';
 
 import styles from './ToastPlayground.module.css';
-import ToastShelf from '../ToastShelf/ToastShelf';
+import { ToastContext } from '../ToastProvider';
 
 const VARIANT_OPTIONS = ['notice', 'warning', 'success', 'error'];
 
 function ToastPlayground() {
   const [message, setMessage] = React.useState('');
   const [variant, setVariant] = React.useState(VARIANT_OPTIONS[0]);
-  const [toasts, setToasts] = React.useState([]);
-
-  function onToastDismiss(id) {
-    // don't use the outer toasts here as it's a closure
-    // and so it depends on what version of onClose you're using
-    setToasts((toasts) => toasts.filter((item) => item.id !== id));
-  }
+  const { createToast } = React.useContext(ToastContext);
 
   function handleCreateToast(event) {
     event.preventDefault();
-    const id = crypto.randomUUID();
-    setToasts([
-      ...toasts,
-      { id, variant, message, onClose: () => onToastDismiss(id) },
-    ]);
+    createToast(variant, message);
     setMessage('');
     setVariant(VARIANT_OPTIONS[0]);
   }
@@ -35,8 +25,6 @@ function ToastPlayground() {
         <img alt="Cute toast mascot" src="/toast.png" />
         <h1>Toast Playground</h1>
       </header>
-
-      <ToastShelf toasts={toasts} />
 
       <form className={styles.controlsWrapper} onSubmit={handleCreateToast}>
         <div className={styles.row}>
