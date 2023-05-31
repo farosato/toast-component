@@ -1,6 +1,7 @@
 import React from 'react';
 
 import ToastShelf from '../ToastShelf';
+import useKeyDown from '../../hooks/use-keydown.hook';
 
 export const ToastContext = React.createContext();
 
@@ -21,17 +22,9 @@ function ToastProvider({ children }) {
     ]);
   }
 
-  React.useEffect(() => {
-    function handleKeyDown(event) {
-      if (event.key === 'Escape') {
-        setToasts([]);
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [setToasts]);
+  const handleEscape = React.useCallback(() => setToasts([]), []);
+
+  useKeyDown('Escape', handleEscape); // no need to use useMemo on 'Escape' as it's not an object
 
   return (
     <ToastContext.Provider value={{ toasts, createToast, dismissToast }}>
